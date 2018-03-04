@@ -90,9 +90,15 @@ let main = async () => {
   console.log("\tContract: " + await getBalance(contractInstance.options.address) + "\n");
 
   // send instead of call. Otherwise, the method invocation has no effect
+  // case 1: payout
   await contractInstance.methods.payoutToSeller().send({
     from: arbiter
   });
+
+  // case 2: refund
+  // await contractInstance.methods.refundBuyer().send({
+  //   from: arbiter
+  // });
 
   console.log("After the arbiter allowed the payout:");
   console.log("\tBuyer: " + await getBalance(buyer));
