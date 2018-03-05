@@ -1,5 +1,6 @@
 const Web3 = require("web3");
 const solc = require("solc");
+const fs = require("fs");
 let web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 
 let getBalance = (acc) => {
@@ -17,37 +18,10 @@ let getBalance = (acc) => {
   })
 }
 
-let source = `pragma solidity ^0.4.20;
-contract Escrow {
-  address public buyer;
-  address public seller;
-  address public arbiter;
-
-  function Escrow(address _seller, address _arbiter) public payable { 
-    buyer = msg.sender;
-    seller = _seller;
-    arbiter = _arbiter;
-  }
-
-  function payoutToSeller() public {
-    if (msg.sender == arbiter || msg.sender == buyer) {
-      seller.send(this.balance); // this = contract
-    }
-  }
-
-  function refundBuyer() public {
-    if (msg.sender == arbiter || msg.sender == seller) {
-      buyer.send(this.balance);
-    }
-  }
-
-  function getBalance() constant returns (uint) {
-    return this.balance;
-  }
-}
-`
-
 let main = async () => {
+  // loading the source code from a solidity file
+  let source = fs.readFileSync("./escrow.sol", "utf8");
+
   let accounts = await web3.eth.getAccounts();
   let buyer = accounts[0];
   let seller = accounts[1];
